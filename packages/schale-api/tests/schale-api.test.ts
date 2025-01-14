@@ -1,5 +1,5 @@
 import { expect, test, describe } from "vitest";
-import SchaleApiAxios from "../src/schale-api-axios";
+import { SchaleApiAxios } from "../src/schale-api-axios";
 import { Server } from "../src/domains/server";
 import { Language } from "../src/domains/language";
 import { Released } from "../src/domains/response";

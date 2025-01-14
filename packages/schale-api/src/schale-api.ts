@@ -24,7 +24,7 @@ const DEFAULT_BASE_URL = "https://schaledb.com";
 const DEFAULT_LANGUAGE = Language.Japanese;
 const DEFAULT_SERVER = Server.Japan;
 
-export default class SchaleApi {
+export class SchaleApi {
   baseURL: string;
   language: Language;
   server: Server;

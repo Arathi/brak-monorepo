@@ -1,10 +1,11 @@
-import { Editor } from '@monaco-editor/react';
-import { useEffect, useMemo, useState } from 'react';
+import { Editor } from "@monaco-editor/react";
+import { useEffect, useMemo, useState } from "react";
 import { Form, Input } from "antd";
-import { SchaleApi } from '@brak/schale-api';
+import { SchaleApi } from "@brak/schale-api";
 import * as JsonTypeGen from "json_typegen_wasm";
+import JSONPath from "jsonpath";
 
-import './App.less';
+import "./App.less";
 
 type Student = {
   Id: number;
@@ -20,13 +21,30 @@ type Item = {
   Desc: string;
 };
 
+type IdMap<D extends object = object> = {
+  [key: number]: D;
+};
+
 const App = () => {
   const api = new SchaleApi();
   const [name, setName] = useState("Schema");
   const [dataType, setDataType] = useState("students");
-  const [content, setContent] = useState<Record<number, object>>({});
+  const [content, setContent] = useState<IdMap>({});
   const [unwrap, setUnwrap] = useState("/-");
-  const [enums, setEnums] = useState<string[]>([]);
+  const [enums, setEnums] = useState<Record<string, string>>({
+    StarGrade: "StarGrade",
+    School: "School",
+    SquadType: "SquadType",
+    TacticRole: "TacticRole",
+    Position: "Position",
+    BulletType: "BulletType",
+    ArmorType: "ArmorType",
+    StreetBattleAdaptation: "BattleAdaptation",
+    OutdoorBattleAdaptation: "BattleAdaptation",
+    IndoorBattleAdaptation: "BattleAdaptation",
+    WeaponType: "WeaponType",
+  });
+
   const [source, setSource] = useState("");
 
   useEffect(() => {
@@ -34,15 +52,13 @@ const App = () => {
   }, []);
 
   async function updateContent(dataType: string) {
-    const resp = await api.getData<Record<number, object>>(dataType, {});
+    const resp = await api.getData<IdMap>(dataType, {});
     setContent(resp);
   }
 
   const hints = {
-    "/IsReleased": { use_type: "[boolean, boolean, boolean]" },
-    "/StarGrade": { use_type: "1 | 2 | 3" },
-    "/Equipment": { use_type: "[EquipmentSlot1, EquipmentSlot2, EquipmentSlot3]" },
-    "/Skills": { use_type: "Record<string, Skill>" },
+    // 枚举
+    "/StarGrade": { use_type: "StarGrade" },
     "/School": { use_type: "School" },
     "/SquadType": { use_type: "SquadType" },
     "/TacticRole": { use_type: "TacticRole" },
@@ -53,6 +69,11 @@ const App = () => {
     "/OutdoorBattleAdaptation": { use_type: "BattleAdaptation" },
     "/IndoorBattleAdaptation": { use_type: "BattleAdaptation" },
     "/WeaponType": { use_type: "WeaponType" },
+    // 数组
+    "/IsReleased": { use_type: "[boolean, boolean, boolean]" },
+    "/Equipment": { use_type: "[Equipment1, Equipment2, Equipment3]" },
+    // 复杂结构
+    "/Skills": { use_type: "Record<string, Skill>" },
   };
 
   useEffect(() => {
@@ -75,10 +96,22 @@ const App = () => {
       <div className="app-options">
         <Form labelCol={{ span: 4 }} wrapperCol={{ span: 16 }}>
           <Form.Item label="名称">
-            <Input value={name} />
+            <Input
+              value={name}
+              onChange={(e) => {
+                const value = e.currentTarget.value;
+                setName(value);
+              }}
+            />
           </Form.Item>
           <Form.Item label="Unwrap">
-            <Input value={unwrap} />
+            <Input
+              value={unwrap}
+              onChange={(e) => {
+                const value = e.currentTarget.value;
+                setUnwrap(value);
+              }}
+            />
           </Form.Item>
         </Form>
       </div>

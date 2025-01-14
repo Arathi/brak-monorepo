@@ -1,7 +1,7 @@
 {
   "name": "@brak/generator",
   "private": true,
-  "version": "0.25.114",
+  "version": "0.25.114-alpha+1",
   "scripts": {
     "build": "rsbuild build",
     "check": "biome check --write",
@@ -14,14 +14,17 @@
     "@monaco-editor/react": "4.7.0-rc.0",
     "antd": "^5.23.1",
     "json_typegen_wasm": "^0.7.0",
+    "jsonpath": "^1.1.1",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-router": "^7.1.1"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.3",
     "@rsbuild/core": "^1.1.8",
     "@rsbuild/plugin-less": "^1.1.0",
     "@rsbuild/plugin-react": "^1.0.7",
+    "@types/jsonpath": "^0.2.4",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "typescript": "^5.7.2"

@@ -1,5 +1,5 @@
 import axios, { AxiosProxyConfig } from "axios";
-import { SchaleApi, SchaleApiOptions, Proxy } from "./schale-api";
+import { SchaleApi, SchaleApiOptions, Proxy } from "../src/schale-api";
 
 export class SchaleApiAxios extends SchaleApi {
   constructor(options: SchaleApiOptions) {

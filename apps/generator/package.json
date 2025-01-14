@@ -10,7 +10,7 @@
     "preview": "rsbuild preview"
   },
   "dependencies": {
-    "@brak/schale-api": "workspace:0.25.113-alpha",
+    "@brak/schale-api": "workspace:0.25.114",
     "@monaco-editor/react": "4.7.0-rc.0",
     "antd": "^5.23.1",
     "json_typegen_wasm": "^0.7.0",

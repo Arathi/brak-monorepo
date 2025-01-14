@@ -1,6 +1,5 @@
 {
   "name": "@brak/schale-api",
-  "private": true,
   "version": "0.25.114",
   "type": "module",
   "exports": {

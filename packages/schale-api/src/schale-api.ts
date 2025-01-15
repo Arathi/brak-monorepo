@@ -25,6 +25,9 @@ const DEFAULT_BASE_URL = "https://schaledb.com";
 const DEFAULT_LANGUAGE = Language.Japanese;
 const DEFAULT_SERVER = Server.Japan;
 
+type StudentAssetType = "collection" | "icon" | "lobby" | "portrait";
+type ItemAssetType = "full" | "icon";
+
 export class SchaleApi {
   baseURL: string;
   language: Language;
@@ -88,6 +91,20 @@ export class SchaleApi {
       }
     }
     return output;
+  }
+
+  getAsset(...paths: string[]) {
+    return [this.baseURL, ...paths].join("/");
+  }
+
+  getStudentAsset(type: StudentAssetType, id: number) {
+    const fileName = `${id}.webp`;
+    return this.getAsset("images", "student", type, fileName);
+  }
+
+  getItemAsset(type: ItemAssetType, name: string) {
+    const fileName = `${name}.webp`;
+    return this.getAsset("images", "item", type, fileName);
   }
 
   async getData<D>(name: string, options: GetDataOptions = {}) {

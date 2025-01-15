@@ -23,6 +23,7 @@ export const Student = () => {
       name="Student"
       input={content}
       unwrap="/-"
+      path="$.*"
       enums={[
         "School",
         "StarGrade",

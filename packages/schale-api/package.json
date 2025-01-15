@@ -1,6 +1,6 @@
 {
   "name": "@brak/schale-api",
-  "version": "0.25.115",
+  "version": "0.25.116-alpha",
   "type": "module",
   "exports": {
     ".": {
@@ -25,7 +25,7 @@
   "devDependencies": {
     "@biomejs/biome": "^1.9.3",
     "@rslib/core": "^0.3.1",
-    "@types/node": "^22.8.1",
+    "@types/node": "^22",
     "axios": "^1.7.9",
     "typescript": "^5.7.3",
     "vitest": "^2.1.8"

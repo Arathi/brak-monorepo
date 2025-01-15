@@ -1,7 +1,7 @@
 {
   "name": "@brak/generator",
   "private": true,
-  "version": "0.25.114-alpha+1",
+  "version": "0.25.114-alpha+2",
   "scripts": {
     "build": "rsbuild build",
     "check": "biome check --write",
@@ -10,7 +10,7 @@
     "preview": "rsbuild preview"
   },
   "dependencies": {
-    "@brak/schale-api": "workspace:0.25.114",
+    "@brak/schale-api": "workspace:*",
     "@monaco-editor/react": "4.7.0-rc.0",
     "antd": "^5.23.1",
     "json_typegen_wasm": "^0.7.0",

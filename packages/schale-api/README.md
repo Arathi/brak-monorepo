@@ -1,23 +1,17 @@
-# Rslib Project
+# Schale API
 
-## Setup
+## 简述
 
-Install the dependencies:
+Schale API 是一个用于获取 [Schale DB](https://schaledb.com/home) 资源的 API。
 
-```bash
-pnpm install
-```
+## 功能
 
-## Get Started
+* 获取学生信息（students）
+* 获取物品信息（items）
 
-Build the library:
+## 计划
 
-```bash
-pnpm build
-```
-
-Build the library in watch mode:
-
-```bash
-pnpm dev
-```
+- [ ] 获取设置（config）
+- [ ] 获取本地化（localization）
+- [ ] 获取关卡信息（stages）
+- [ ] 获取敌人信息（enemies）

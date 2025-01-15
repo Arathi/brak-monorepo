@@ -18,6 +18,7 @@ export interface SchaleApiOptions {
 export interface GetDataOptions {
   language?: Language;
   server?: Server;
+  useMin?: boolean;
 }
 
 const DEFAULT_BASE_URL = "https://schaledb.com";
@@ -60,10 +61,16 @@ export class SchaleApi {
   private getDataPath(name: string, options: GetDataOptions = {}) {
     const language = options.language ?? this.language;
     const server = options.server ?? this.server;
+    const min = options.useMin ?? false;
+    const dotMin = min ? ".min" : "";
     switch (name) {
       case "students":
       case "items":
-        return `/data/${language}/${name}.json`;
+      case "config":
+      case "localization":
+      case "stages":
+      case "enemies":
+        return `/data/${language}/${name}${dotMin}.json`;
     }
     return "";
   }
@@ -85,7 +92,7 @@ export class SchaleApi {
 
   async getData<D>(name: string, options: GetDataOptions = {}) {
     const dataPath = this.getDataPath(name, options);
-    const url = `${this.baseURL}/${dataPath}`;
+    const url = `${this.baseURL}${dataPath}`;
     return this.get<D>(url, this.proxy);
   }
 

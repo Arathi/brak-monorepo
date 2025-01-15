@@ -6,6 +6,12 @@ import { Released } from "../src/domains/response";
 
 type Student = Released & {
   Name: string;
+  School: string;
+};
+
+type Item = Released & {
+  Name: string;
+  Category: string;
 };
 
 describe("SchaleApi 测试", async () => {
@@ -41,16 +47,63 @@ describe("SchaleApi 测试", async () => {
       });
       expect(aris).not.toBeNull();
       expect(aris!.Name).toBe("爱丽丝");
+      expect(aris!.School).toBe("Millennium");
       console.info(`获取国服学生10015信息：${aris!.Name}`);
     }
 
     {
-      // 不存在
+      // 睡衣诺亚（未实装）
       const noa_pajama = await api.getStudent(10109, {
         server: Server.China,
       });
       expect(noa_pajama).toBeNull();
       console.info("获取国服学生10109信息如下：", noa_pajama);
+    }
+  });
+
+  test("获取所有物品信息", async () => {
+    {
+      const items = await api.getItems<Item>();
+      const keys = Object.keys(items);
+      console.info(`获取日服物品数据 ${keys.length} 个`);
+    }
+
+    {
+      const items = await api.getItems<Item>({
+        server: Server.Global,
+      });
+      const keys = Object.keys(items);
+      console.info(`获取国际服物品数据 ${keys.length} 个`);
+    }
+
+    {
+      const items = await api.getItems<Item>({
+        server: Server.China,
+      });
+      const keys = Object.keys(items);
+      console.info(`获取国服物品数据 ${keys.length} 个`);
+    }
+  });
+
+  test("获取指定物品信息", async () => {
+    {
+      // 弗雷纳帕提斯的大人的卡片
+      const card = await api.getItem<Item>(200000, {
+        language: Language.Chinese,
+      });
+      expect(card).not.toBeNull();
+      expect(card!.Name).toBe("弗雷纳帕提斯的大人的卡片");
+      expect(card!.Category).toBe("Consumable");
+      console.info(`获取国服物品200000信息：${card!.Name}`);
+    }
+
+    {
+      // 装有咖啡的马克杯（未实装）
+      const mug = await api.getItem(20001001, {
+        server: Server.China,
+      });
+      expect(mug).toBeNull();
+      console.info("获取国服物品20001001信息如下：", mug);
     }
   });
 });

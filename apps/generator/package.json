@@ -1,7 +1,7 @@
 {
   "name": "@brak/generator",
   "private": true,
-  "version": "0.25.114-alpha+2",
+  "version": "0.25.116",
   "scripts": {
     "build": "rsbuild build",
     "check": "biome check --write",

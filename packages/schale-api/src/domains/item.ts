@@ -1,11 +1,17 @@
-export type Category =
-  | "Material"
-  | "Coin"
-  | "CharacterExpGrowth"
-  | "Favor"
-  | "SecretStone"
-  | "Collectible"
-  | "Consumable";
+// Item
+
+import type {} from "./index";
+import {} from "./index";
+
+export enum Category {
+  Material = "Material",
+  Coin = "Coin",
+  CharacterExpGrowth = "CharacterExpGrowth",
+  Favor = "Favor",
+  SecretStone = "SecretStone",
+  Collectible = "Collectible",
+  Consumable = "Consumable",
+}
 
 export type Item = {
   Id: number;
@@ -61,3 +67,5 @@ export type Item = {
     AmountMax: number;
   }>;
 };
+
+// Generated at 2025-01-16T06:28:40.863Z

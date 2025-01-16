@@ -1,223 +1,110 @@
-import { Form, Input, Select } from "antd";
+import { OutputMode, outputModes } from "@/domains/output-mode";
 import { Editor } from "@monaco-editor/react";
+import {
+  AutoComplete,
+  Button,
+  Flex,
+  Form,
+  Input,
+  InputProps,
+  Select,
+  SelectProps,
+  Table,
+  TableProps,
+  Tabs,
+} from "antd";
 import { useEffect, useMemo, useState } from "react";
-import * as TypeGen from "json_typegen_wasm";
 import * as JSONPath from "jsonpath";
+import { ofEnum, ofType, Schema } from "@/domains/schema";
+import { SchaleApi } from "@brak/schale-api";
+import { Hint } from "@/domains/hint";
+import * as TypeGen from "json_typegen_wasm";
 
 import "./index.less";
 
-// #region 类型定义
-type Options = {
-  /**
-   * 名称
-   */
-  name: string;
-
-  /**
-   * 输入JSON
-   */
-  input: string;
-
-  /**
-   * 输出模式
-   */
-  outputMode: string;
-
-  /**
-   * 解包pointer
-   */
-  unwrap: string;
-
-  /**
-   * JSONPath
-   */
-  path: string;
-
-  /**
-   * 子类型
-   */
-  types: Type[];
-};
-
-/**
- * 类型提示
- */
-type Hint = {
-  use_type?: string;
-  type_name?: string;
-};
-
-/**
- * 类型定义
- */
-type Schema = "type" | "enum";
-type Type = {
-  name: string;
-  schema: Schema;
-  declared: boolean;
-  pointers: string[];
-  paths: string[];
-};
-
-type OfTypeOptions = {
-  declared?: boolean;
-  pointers?: string | string[];
-  paths?: string | string[];
-};
-
-export function ofType(
-  name: string,
-  schema: Schema,
-  options: OfTypeOptions
-): Type {
-  const declared = options.declared ?? false;
-
-  const pointers: string[] = [];
-  const inputPointers = options.pointers;
-  switch (typeof inputPointers) {
-    case "undefined":
-      pointers.push(`/${name}`);
-      break;
-    case "string":
-      pointers.push(inputPointers);
-      break;
-    case "object":
-      pointers.push(...inputPointers);
-      break;
-  }
-
-  const paths: string[] = [];
-  const inputPaths = options.paths;
-  switch (typeof inputPaths) {
-    case "undefined":
-      paths.push(`\$.*.${name}`);
-      break;
-    case "string":
-      paths.push(inputPaths);
-      break;
-    case "object":
-      paths.push(...inputPaths);
-      break;
-  }
-
-  return {
-    name,
-    schema,
-    declared,
-    pointers,
-    paths,
-  };
-}
+const api = new SchaleApi();
 
 type Props = {
-  name?: string;
-  input?: string;
-  unwrap?: string;
-  path?: string;
-  types?: Type[];
+  //
 };
-// #endregion
 
-// #region 输出模式
-const outputModes = [
-  {
-    value: "rust",
-    label: "Rust",
-  },
-  {
-    value: "typescript",
-    label: "TypeScript",
-  },
-  {
-    value: "typescript/typealias",
-    label: "TypeScript (single typealias)",
-  },
-  {
-    value: "kotlin/jackson",
-    label: "Kotlin (Jackson)",
-  },
-  {
-    value: "kotlin/kotlinx",
-    label: "Kotlin (kotlinx.serialization)",
-  },
-  {
-    value: "python",
-    label: "Python (pydantic)",
-  },
-  {
-    value: "json_schema",
-    label: "JSON Schema",
-  },
-  {
-    value: "shape",
-    label: "Shape (internal representation)",
-  },
-];
-// #endregion
+type Prefab = {
+  value: string;
+  label: React.ReactNode;
+  fileName?: string;
+  unwrap?: string;
+  paths?: string;
+  schemas?: Schema[];
+};
 
-const Generator: React.FC<Props> = (props) => {
-  // #region states
-  const [options, setOptions] = useState<Options>({
-    name: props.name ?? "Schema",
-    input: props.input ?? "",
-    outputMode: "typescript/typealias",
-    unwrap: props.unwrap ?? "",
-    path: props.path ?? "",
-    types: props.types ?? [],
-  });
+const Generator: React.FC<Props> = () => {
+  const [name, setName] = useState("");
 
-  const [filtered, setFiltered] = useState("");
+  const [inputSource, setInputSource] = useState("");
 
-  const [source, setSource] = useState("");
-  // #endregion
+  const [outputMode, setOutputMode] = useState<OutputMode>(
+    "typescript/typealias"
+  );
 
-  // #region memos
-  const input = useMemo<object>(() => {
-    try {
-      return JSON.parse(options.input);
-    } catch (ex) {
-      console.warn("解析输入出现异常", ex);
-      return {};
-    }
-  }, [options.input]);
+  const [unwrap, setUnwrap] = useState("");
+  const [paths, setPaths] = useState<string>("");
+  const [pathsStatus, setPathsStatus] = useState<InputProps["status"]>("");
 
-  const shape = useMemo(() => {
-    try {
-      const typegenOptions = {
-        output_mode: "shape",
-        unwrap: options.unwrap,
-      };
-      const shape = typegen(
-        "Shape",
-        options.input,
-        JSON.stringify(typegenOptions)
-      );
-      console.info("Shape转换如下：", shape);
-      return JSON.parse(shape);
-    } catch (ex) {
-      console.warn("解析输入出现异常", ex);
-      return {};
-    }
-  }, [options.input, options.unwrap]);
+  const [editorTheme, setEditorTheme] = useState("vs-dark");
+  const [schemas, setSchemas] = useState<Schema[]>([]);
 
-  const properties = useMemo(() => {
-    const properties = [];
-    try {
-      for (const key in shape) {
-        properties.push({
-          value: key,
-          label: key,
-        });
+  const [prefabs, setPrefabs] = useState<Prefab[]>([
+    {
+      value: "Student",
+      label: "Student (学生信息)",
+      fileName: "students",
+      unwrap: "/-",
+      paths: "$.*",
+      schemas: [
+        ofType("Released", {
+          pointers: "/IsReleased",
+          alias: "[boolean, boolean, boolean]",
+        }),
+        ofEnum("School"),
+        ofType("StarGrade"),
+        ofEnum("SquadType"),
+        ofEnum("TacticRole"),
+        ofEnum("Position"),
+        ofEnum("BulletType"),
+        ofEnum("ArmorType"),
+        ofEnum("WeaponType"),
+        ofType("Skills", {
+          alias: "object",
+        }),
+      ],
+    },
+    {
+      value: "Item",
+      label: "Item (物品信息)",
+      fileName: "items",
+      unwrap: "/-",
+      paths: "$.*",
+      schemas: [ofEnum("Category")],
+    },
+    {
+      value: "Skill",
+      label: "Skill (技能信息)",
+    },
+  ]);
+
+  const pathList = useMemo(() => {
+    const list: string[] = [];
+    paths.split(",").forEach((path) => {
+      const trimmed = path.trim();
+      if (trimmed.length > 0) {
+        list.push(trimmed);
       }
-      return properties;
-    } catch (ex) {
-      console.warn("解析输入出现异常", ex);
-    }
-    return [];
-  }, [shape]);
+    });
+    return list;
+  }, [paths]);
 
-  const outputLanguage = useMemo(() => {
-    switch (options.outputMode) {
+  const language = useMemo(() => {
+    switch (outputMode) {
       case "rust":
         return "rust";
       case "typescript":
@@ -230,191 +117,369 @@ const Generator: React.FC<Props> = (props) => {
         return "python";
       case "json_schema":
       case "shape":
+      default:
         return "json";
     }
-    return "text";
-  }, [options.outputMode]);
+  }, [outputMode]);
+
+  const outputModeOptions = useMemo(() => {
+    const options: SelectProps["options"] = [];
+    for (const key in outputModes) {
+      const value = key as OutputMode;
+      const label = outputModes[value];
+      options.push({
+        value,
+        label,
+      });
+    }
+    return options;
+  }, [outputModes]);
+
+  const input = useMemo(() => {
+    try {
+      return JSON.parse(inputSource);
+    } catch (ex) {
+      console.warn("输入JSON解析出现异常：", ex);
+      return {};
+    }
+  }, [inputSource]);
 
   const hints = useMemo(() => {
     const hints: Record<string, Hint> = {};
-    return hints;
-  }, []);
-
-  const subTypes = useMemo<string[]>(() => {
-    const types: string[] = [];
-    return types;
-  }, []);
-
-  // const filtered = useMemo<any[]>(() => {
-  //   return JSONPath.query(input, options.path);
-  // }, [input, options.path]);
-  // #endregion
-
-  // #region hooks
-  const [form] = Form.useForm();
-  // #endregion
-
-  // #region effects
-  useEffect(() => {
-    console.info("input发生变化");
-    const input = props.input ?? "";
-    setOptions({
-      ...options,
-      input,
-    });
-    form.setFieldValue("input", input);
-  }, [props.input]);
-
-  useEffect(() => {
-    try {
-      const results = JSONPath.query(input, options.path);
-      const filtered = JSON.stringify(results, null, 2);
-      setFiltered(filtered);
-    } catch (ex) {
-      console.warn("JSONPath查询失败", ex);
+    for (const schema of schemas) {
+      const { name, pointers } = schema;
+      for (const pointer of pointers) {
+        hints[pointer] = {
+          use_type: name,
+        };
+      }
     }
-  }, [input, options.path]);
+    return hints;
+  }, [schemas]);
 
-  useEffect(() => {
+  const shapeJson = useMemo(() => {
     try {
-      const { name, input } = options;
-      const typegenOptions = {
-        output_mode: options.outputMode,
-        unwrap: options.unwrap,
+      const options = {
+        output_mode: "shape",
+        unwrap,
         ...hints,
       };
-
-      const typeImports = [];
-      const directImports = [];
-
-      const definition = typegen(name, input, JSON.stringify(typegenOptions));
-      setSource(
-        `
-import type {} from ".";
-import {} from ".";
-
-// #region Types
-${subTypes.join("\n")}
-// #endregion
-
-${definition}
-
-// Generated at ${new Date().toISOString()}
-`.trim()
-      );
+      return TypeGen.run(name, inputSource, JSON.stringify(options));
     } catch (ex) {
-      console.warn("生成失败");
+      console.warn("Shade生成失败！", ex);
+      return "{}";
     }
-  }, [options, hints, subTypes]);
-  // #endregion
+  }, [name, inputSource, outputMode, unwrap, hints]);
 
-  // #region functions
-  function typegen(name: string, input: string, options: string) {
-    console.info(`正在生成类型：\nrun('${name}', input, '${options}')`);
-    const result = TypeGen.run(name, input, options);
-    return result;
+  const shape = useMemo(() => {
+    try {
+      return JSON.parse(shapeJson);
+    } catch (ex) {
+      console.warn("Shade解析失败！", ex);
+      return {};
+    }
+  }, [shapeJson]);
+
+  const filtered = useMemo(() => {
+    const filtered: any[] = [];
+    try {
+      for (const path of pathList) {
+        const results = JSONPath.query(input, path);
+        filtered.push(...results);
+      }
+      setPathsStatus("");
+    } catch (ex) {
+      console.warn("过滤JSON出现异常：", ex);
+      setPathsStatus("error");
+    }
+    return filtered;
+  }, [input, pathList]);
+
+  const filteredFormatted = useMemo(() => {
+    try {
+      return JSON.stringify(filtered, null, 2);
+    } catch (e) {
+      return `{"_comment:": "转换失败"}`;
+    }
+  }, [filtered]);
+
+  const hintsFormatted = useMemo(() => {
+    try {
+      return JSON.stringify(hints, null, 2);
+    } catch (e) {
+      return `{"_comment:": "转换失败"}`;
+    }
+  }, [hints]);
+
+  function exportSchema(schema: Schema) {
+    let values: any[] = [];
+    try {
+      for (const path of schema.paths) {
+        const results = JSONPath.query(input, path);
+        values.push(...results);
+      }
+    } catch (e) {
+      console.warn("过滤失败！", e);
+    }
+    const set = new Set(values);
+    values = Array.from(set);
+
+    if (schema.enum) {
+      return exportEnum(schema, values);
+    }
+    return exportType(schema, values);
   }
 
-  function generateType(
-    name: string,
-    input: object,
-    paths: string[],
-    schema: Schema = "type"
-  ) {
-    const valueList: any[] = [];
-    for (const path of paths) {
-      const filtered = JSONPath.query(input, path);
-      valueList.push(...filtered);
+  function exportEnum(schema: Schema, values: any[]) {
+    const lines = values.map((value) => {
+      if (typeof value === "string") {
+        return `  ${value} = "${value}",`;
+      }
+      return `  ${value} = ${value},`;
+    });
+    return `export enum ${schema.name} {
+${lines.join("\n")}
+}
+`;
+  }
+
+  function exportType(schema: Schema, values: any[]) {
+    let definition = "";
+    if (schema.alias !== undefined) {
+      definition = schema.alias;
+    } else {
+      definition = values
+        .map((value) => {
+          if (typeof value === "string") return `"${value}"`;
+          return `${value}`;
+        })
+        .join(" | ");
     }
-    const valueSet = new Set(valueList);
-    const lines: string[] = [];
-    if (schema === "type") {
-      valueSet.forEach((value) => {
-        const line = `  | ${value} `;
-        lines.push(line);
-      });
-      return `export type ${name} = 
-${lines.join("\n")}
-;`;
-    } else if (schema === "enum") {
-      valueSet.forEach((value) => {
-        const line = `  ${value} = "${value}",`;
-        lines.push(line);
-      });
-      return `export enum ${name} {
-${lines.join("\n")}
-}`;
+    return `export type ${schema.name} = ${definition};
+`;
+  }
+
+  const outputSource = useMemo(() => {
+    const externalTypes: string[] = [];
+    const externalEnums: string[] = [];
+    const internalSchemas: string[] = [];
+
+    for (const schema of schemas) {
+      if (schema.external) {
+        if (schema.enum) {
+          externalEnums.push(schema.name);
+        } else {
+          externalTypes.push(schema.name);
+        }
+      } else {
+        internalSchemas.push(exportSchema(schema));
+      }
+    }
+
+    const output = TypeGen.run(
+      name,
+      inputSource,
+      JSON.stringify({
+        output_mode: "typescript/typealias",
+        unwrap,
+        ...hints,
+      })
+    );
+
+    return `// ${name}
+
+import type { ${externalTypes.join(",")} } from "./index";
+import { ${externalEnums.join(",")} } from "./index";
+
+${internalSchemas.join("\n")}
+${output}
+// Generated at ${new Date().toISOString()}`.trim();
+  }, [name, inputSource, unwrap, hints]);
+
+  useEffect(() => {
+    const prefab = prefabs.find((prefab) => prefab.value === name);
+    if (prefab !== undefined) {
+      updateInputs(prefab);
+    }
+  }, [name, prefabs]);
+
+  async function updateInputs(prefab: Prefab) {
+    try {
+      const { fileName, unwrap, paths, schemas } = prefab;
+      if (fileName !== undefined) {
+        const data = await api.getData<object>(fileName);
+        setInputSource(JSON.stringify(data, null, 2));
+      }
+      if (unwrap !== undefined) {
+        setUnwrap(unwrap);
+      }
+      if (paths !== undefined) {
+        setPaths(paths);
+      }
+      if (schemas !== undefined) {
+        setSchemas(schemas);
+      }
+    } catch (ex) {
+      console.warn("更新输入表单出现异常：", ex);
     }
   }
-  // #endregion
 
-  // const subTypes = useMemo(() => {
-  //   try {
-  //     const input = JSON.parse(options.input);
-  //     return options.types
-  //       .map((tpd) => {
-  //         return generateEnum(input, tpd);
-  //       })
-  //       .join("\n");
-  //   } catch (ex) {
-  //     console.error(`input解析失败！`);
-  //   }
-  //   return "";
-  // }, [options.input, options.types]);
-
-  // const extraHints = useMemo(() => {
-  //   const hints: Record<string, Hint> = {};
-  //   for (const tpd of options.types) {
-  //     const key = `/${tpd.}`;
-  //     hints[key] = {
-  //       use_type: property,
-  //     };
-  //   }
-  //   return hints;
-  // }, [options.types]);
+  const columns: TableProps<Schema>["columns"] = [
+    {
+      key: "name",
+      title: "Name",
+      dataIndex: "name",
+    },
+    {
+      key: "category",
+      title: "分类",
+      dataIndex: "enum",
+      render: (asEnum) => {
+        return asEnum ? "enum" : "type";
+      },
+    },
+    {
+      key: "external",
+      title: "外部定义",
+      dataIndex: "external",
+      render: (external) => {
+        return external ? "是" : "否";
+      },
+    },
+    {
+      key: "pointers",
+      title: "JSONPointer",
+      dataIndex: "pointers",
+      render: (values) => {
+        return values.join(", ");
+      },
+    },
+    {
+      key: "paths",
+      title: "JSONPath",
+      dataIndex: "paths",
+      render: (values) => {
+        return values.join(", ");
+      },
+    },
+  ];
 
   return (
     <div className="generator">
-      <div className="generator-options">
-        <Form
-          form={form}
-          layout="vertical"
-          initialValues={options}
-          onValuesChange={(_, values) => {
-            console.info("表单发生变化：", values);
-            setOptions(values);
-          }}
-        >
-          <Form.Item label="Name" name="name">
-            <Input />
+      <div className="inputs">
+        <Form labelCol={{ flex: "120px" }}>
+          <Form.Item label="Name">
+            <AutoComplete
+              options={prefabs}
+              value={name}
+              onChange={(value) => setName(value)}
+            />
           </Form.Item>
-          <Form.Item label="Input" name="input">
-            <Editor className="option-input" language="json" theme="vs-dark" />
+          <Form.Item label="Input">
+            <Editor
+              className="monaco-editor input-source"
+              theme={editorTheme}
+              value={inputSource}
+              language="json"
+              onChange={(value) => setInputSource(value ?? "")}
+            />
           </Form.Item>
-          <Form.Item label="Output mode" name="outputMode">
-            <Select options={outputModes} />
+          <Form.Item label="Output Mode">
+            <Select
+              options={outputModeOptions}
+              value={outputMode}
+              onChange={(value) => setOutputMode(value)}
+            />
           </Form.Item>
-          <Form.Item label="Unwrap path" name="unwrap">
-            <Input />
+          <Form.Item label="Unwrap">
+            <Input
+              value={unwrap}
+              onChange={(e) => {
+                const value = e.currentTarget.value;
+                setUnwrap(value);
+              }}
+            />
           </Form.Item>
-          <Form.Item label="JSON Path" name="path">
-            <Input />
+          <Form.Item label="Filter">
+            <Input
+              value={paths}
+              status={pathsStatus}
+              onChange={(e) => {
+                const value = e.currentTarget.value;
+                setPaths(value);
+              }}
+            />
           </Form.Item>
-          <Form.Item label="Hints" name="hints">
-            <Editor className="option-hints" language="json" theme="vs-dark" />
-          </Form.Item>
-          <Form.Item label="Enums" name="enums">
-            <Select mode="multiple" size="small" options={properties} />
+          <Form.Item label="Sub Types">
+            <Flex justify="end" style={{ marginBottom: 8 }}>
+              <Button variant="solid" color="primary">
+                添加
+              </Button>
+            </Flex>
+            <Table
+              size="small"
+              columns={columns}
+              dataSource={schemas}
+              pagination={false}
+            />
           </Form.Item>
         </Form>
       </div>
-
-      <div className="generator-filtered">
-        <Editor language="json" theme="vs-dark" value={filtered} />
-      </div>
-
-      <div className="generator-preview">
-        <Editor language={outputLanguage} theme="vs-dark" value={source} />
+      <div className="outputs">
+        <Tabs
+          type="card"
+          size="small"
+          items={[
+            {
+              key: "shape",
+              label: "Shape",
+              children: (
+                <Editor
+                  className="monaco-editor"
+                  language="json"
+                  theme={editorTheme}
+                  value={shapeJson}
+                />
+              ),
+            },
+            {
+              key: "hints",
+              label: "Hints",
+              children: (
+                <Editor
+                  className="monaco-editor"
+                  language="json"
+                  theme={editorTheme}
+                  value={hintsFormatted}
+                />
+              ),
+            },
+            {
+              key: "filtered",
+              label: "Filtered",
+              children: (
+                <Editor
+                  className="monaco-editor"
+                  language="json"
+                  theme={editorTheme}
+                  value={filteredFormatted}
+                />
+              ),
+            },
+            {
+              key: "source",
+              label: "Source",
+              children: (
+                <Editor
+                  className="monaco-editor"
+                  language={language}
+                  theme={editorTheme}
+                  value={outputSource}
+                />
+              ),
+            },
+          ]}
+        />
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import Generator from "@/components/Generator";
 
-export const Generic = () => {
+export const Home = () => {
   return (
     <>
       <Generator />

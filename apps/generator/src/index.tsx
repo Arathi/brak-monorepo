@@ -1,9 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router";
-import { Generic } from "./pages/generic";
-import { Student } from "./pages/student";
-import { Item } from "./pages/item";
+import { Home } from "./pages/Home";
 
 import "./index.less";
 
@@ -13,9 +11,7 @@ if (root) {
     <React.StrictMode>
       <BrowserRouter>
         <Routes>
-          <Route index element={<Generic />} />
-          <Route path="/student" element={<Student />} />
-          <Route path="/item" element={<Item />} />
+          <Route index element={<Home />} />
         </Routes>
       </BrowserRouter>
     </React.StrictMode>

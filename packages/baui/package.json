@@ -1,6 +1,7 @@
 {
-  "name": "baui",
-  "version": "1.0.0",
+  "name": "@brak/baui",
+  "private": true,
+  "version": "0.25.116-alpha+0",
   "type": "module",
   "exports": {
     ".": {
@@ -28,6 +29,7 @@
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@rsbuild/core": "1.2.0-beta.0",
+    "@rsbuild/plugin-less": "^1.1.0",
     "@rsbuild/plugin-react": "^1.1.0",
     "@rslib/core": "^0.3.1",
     "@storybook/addon-essentials": "^8.4.7",
@@ -42,15 +44,11 @@
     "@types/react": "^19.0.7",
     "jsdom": "^26.0.0",
     "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "storybook": "^8.4.7",
     "storybook-addon-rslib": "^0.1.8",
     "storybook-react-rsbuild": "^0.1.8",
     "typescript": "^5.7.3",
     "vitest": "^2.1.8"
-  },
-  "peerDependencies": {
-    "react": ">=16.9.0",
-    "react-dom": ">=16.9.0"
-  },
-  "private": true
+  }
 }

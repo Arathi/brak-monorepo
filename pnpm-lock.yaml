@@ -62,9 +62,9 @@ importers:
 
   packages/baui:
     dependencies:
-      react-dom:
-        specifier: '>=16.9.0'
-        version: 19.0.0(react@19.0.0)
+      '@brak/schale-api':
+        specifier: workspace:*
+        version: link:../schale-api
     devDependencies:
       '@biomejs/biome':
         specifier: ^1.9.4
@@ -72,6 +72,9 @@ importers:
       '@rsbuild/core':
         specifier: 1.2.0-beta.0
         version: 1.2.0-beta.0
+      '@rsbuild/plugin-less':
+        specifier: ^1.1.0
+        version: 1.1.0(@rsbuild/core@1.2.0-beta.0)
       '@rsbuild/plugin-react':
         specifier: ^1.1.0
         version: 1.1.0(@rsbuild/core@1.2.0-beta.0)
@@ -114,6 +117,9 @@ importers:
       react:
         specifier: ^19.0.0
         version: 19.0.0
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.0.0(react@19.0.0)
       storybook:
         specifier: ^8.4.7
         version: 8.4.7
@@ -3850,6 +3856,12 @@ snapshots:
   '@rsbuild/plugin-less@1.1.0(@rsbuild/core@1.1.13)':
     dependencies:
       '@rsbuild/core': 1.1.13
+      deepmerge: 4.3.1
+      reduce-configs: 1.1.0
+
+  '@rsbuild/plugin-less@1.1.0(@rsbuild/core@1.2.0-beta.0)':
+    dependencies:
+      '@rsbuild/core': 1.2.0-beta.0
       deepmerge: 4.3.1
       reduce-configs: 1.1.0
 

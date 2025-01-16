@@ -1,8 +1,6 @@
 # Schale API
 
-## 简述
-
-Schale API 是一个用于获取 [Schale DB](https://schaledb.com/home) 资源的 API。
+A simple [Schale DB](http://schaledb.com/) API Library.
 
 ## 功能
 

@@ -1,0 +1,104 @@
+.stack() {
+}
+
+.student-icon {
+  --student-collection-width: 200px;
+  --student-collection-height: 226px;
+  --student-icon-padding: 4px;
+
+  --width: var(--student-collection-width);
+  --height: var(--student-collection-height);
+  --info-height: 40px;
+
+  background: unset;
+  border: unset;
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
+  @gap-start: 8px;
+  @radius: 3%;
+  @gap-end: calc(100% - @gap-start);
+
+  clip-path: polygon(
+    100% 0,
+    100% @gap-end,
+    @gap-end 100%,
+    0 100%,
+    0 @gap-start,
+    @gap-start 0
+  );
+
+  .container {
+    position: relative;
+    width: var(--width);
+    height: var(--height);
+
+    clip-path: inset(
+      0 0
+      round 0px @radius 0 @radius
+    );
+
+    img.avatar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 0;
+
+      width: var(--width);
+      height: var(--height);
+    }
+
+    .information {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      z-index: 1;
+      
+      width: var(--width);
+      height: var(--info-height);
+      background-color: rgba(0, 0, 0, 0.75);
+
+      display: flex;
+      flex-direction: row;
+
+      .attack-armor {
+        display: flex;
+        flex-direction: column;
+        width: 32px;
+
+        .attack-type {
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+          align-items: center;
+          flex: 1;
+          background-color: red;
+        }
+
+        .armor-type {
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+          align-items: center;
+          flex: 1;
+          background-color: orange;
+        }
+
+        img {
+          height: 16px;
+        }
+      }
+
+      .name {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        flex: 1;
+        color: white;
+        font-weight: bold;
+        font-size: 2em;
+      }
+    }
+  }
+}

@@ -146,4 +146,11 @@ export class SchaleApi {
     const items = await this.getItems<D>(options);
     return items[id] ?? null;
   }
+
+  async getStages<D extends Numbered>(
+    options: GetDataOptions = {}
+  ): Promise<DataMap<D>> {
+    const stages = await this.getData<DataMap<D>>("stages", options);
+    return stages;
+  }
 }

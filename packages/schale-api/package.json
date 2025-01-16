@@ -2,6 +2,8 @@
   "name": "@brak/schale-api",
   "version": "0.25.116-beta",
   "type": "module",
+  "author": "Arathi of Nebnizilla",
+  "license": "MIT",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",

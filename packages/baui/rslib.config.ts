@@ -8,6 +8,11 @@ export default defineConfig({
       index: ["./src/**"],
     },
   },
+  resolve: {
+    alias: {
+      "@": "./src",
+    },
+  },
   lib: [
     {
       bundle: false,

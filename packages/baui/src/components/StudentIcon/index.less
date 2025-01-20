@@ -10,6 +10,14 @@
   --height: var(--student-collection-height);
   --info-height: 40px;
 
+  --color-explosion-light: red;
+  --color-pierce-heavy: orange;
+  --color-mystic-special: blue;
+  --color-sonic-elastic: purple;
+
+  --color-squad-striker: red;
+  --color-squad-special: blue;
+
   background: unset;
   border: unset;
   cursor: pointer;
@@ -47,6 +55,28 @@
       width: var(--width);
       height: var(--height);
     }
+    
+    .stars {
+      position: absolute;
+      left: 1px;
+      top: 1px;
+    }
+
+    .squad-role {
+      position: absolute;
+      right: 4px;
+      top: 2px;
+      padding: 2px;
+      border-radius: 50%;
+
+      &.striker {
+        background-color: var(--color-squad-striker);
+      }
+
+      &.special {
+        background-color: var(--color-squad-special);
+      }
+    }
 
     .information {
       position: absolute;
@@ -61,27 +91,53 @@
       display: flex;
       flex-direction: row;
 
+
       .attack-armor {
         display: flex;
         flex-direction: column;
-        width: 32px;
+        width: 40px;
 
-        .attack-type {
+        .attack-armor-type {
           display: flex;
           flex-direction: row;
           justify-content: center;
           align-items: center;
           flex: 1;
-          background-color: red;
+          background-color: gray;
+        }
+
+        .attack-type {
+          .attack-armor-type();
+
+          &.explosion {
+            background-color: var(--color-explosion-light);
+          }
+          &.pierce {
+            background-color: var(--color-pierce-heavy);
+          }
+          &.mystic {
+            background-color: var(--color-mystic-special);
+          }
+          &.sonic {
+            background-color: var(--color-sonic-elastic);
+          }
         }
 
         .armor-type {
-          display: flex;
-          flex-direction: row;
-          justify-content: center;
-          align-items: center;
-          flex: 1;
-          background-color: orange;
+          .attack-armor-type();
+
+          &.light {
+            background-color: var(--color-explosion-light);
+          }
+          &.heavy {
+            background-color: var(--color-pierce-heavy);
+          }
+          &.special {
+            background-color: var(--color-mystic-special);
+          }
+          &.elastic {
+            background-color: var(--color-sonic-elastic);
+          }
         }
 
         img {

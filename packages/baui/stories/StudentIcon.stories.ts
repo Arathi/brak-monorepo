@@ -7,11 +7,47 @@ const meta = {
   component: StudentIcon,
   tags: ["autodocs"],
   argTypes: {
-    metadata: {
+    id: {
       control: "number",
+    },
+    student: {
+      control: "object",
     },
     name: {
       control: "text",
+    },
+    school: {
+      control: "select",
+      options: [
+        "Gehenna",
+        "Millennium",
+        "Trinity",
+        "Abydos",
+        "Shanhaijing",
+        "Hyakkiyako",
+        "RedWinter",
+        "SRT",
+        "Arius",
+        "Tokiwadai",
+        "Valkyrie",
+        "ETC",
+      ],
+    },
+    squad: {
+      control: "select",
+      options: ["Main", "Support"],
+    },
+    role: {
+      control: "select",
+      options: ["DamageDealer", "Tanker", "Supporter", "Healer", "Vehicle"],
+    },
+    attackType: {
+      control: "select",
+      options: ["Explosion", "Mystic", "Pierce", "Sonic"],
+    },
+    armorType: {
+      control: "select",
+      options: ["LightArmor", "HeavyArmor", "Unarmed", "ElasticArmor"],
     },
   },
   args: {
@@ -24,6 +60,6 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    metadata: 10000,
+    id: 10000,
   },
 };

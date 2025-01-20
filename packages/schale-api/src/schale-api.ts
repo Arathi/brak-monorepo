@@ -1,6 +1,7 @@
 import { Server, toServerIndex } from "./domains/server";
 import { Language } from "./domains/language";
 import { Numbered, Released, DataMap } from "./domains/response";
+import { Localization } from "./domains";
 
 export interface Proxy {
   protocol: "http" | "https";
@@ -53,7 +54,7 @@ export class SchaleApi {
     this.proxy = proxy;
   }
 
-  async get<T>(url: string, proxy?: Proxy): Promise<T> {
+  protected async get<T>(url: string, proxy?: Proxy): Promise<T> {
     const resp = await fetch(url, {
       method: "GET",
     });
@@ -61,10 +62,10 @@ export class SchaleApi {
     return body as T;
   }
 
-  private getDataPath(name: string, options: GetDataOptions = {}) {
+  protected getDataPath(name: string, options: GetDataOptions = {}) {
     const language = options.language ?? this.language;
     const server = options.server ?? this.server;
-    const min = options.useMin ?? false;
+    const min = options.useMin ?? true;
     const dotMin = min ? ".min" : "";
     switch (name) {
       case "students":
@@ -78,7 +79,7 @@ export class SchaleApi {
     return "";
   }
 
-  private filter<D extends Numbered = Numbered>(
+  protected filter<D extends Numbered = Numbered>(
     input: DataMap<D>,
     condition: (data: D) => boolean
   ): DataMap<D> {
@@ -105,6 +106,10 @@ export class SchaleApi {
   getItemAsset(type: ItemAssetType, name: string) {
     const fileName = `${name}.webp`;
     return this.getAsset("images", "item", type, fileName);
+  }
+
+  getUIAsset(fileName: string) {
+    return this.getAsset("images", "ui", fileName);
   }
 
   async getData<D>(name: string, options: GetDataOptions = {}) {
@@ -152,5 +157,13 @@ export class SchaleApi {
   ): Promise<DataMap<D>> {
     const stages = await this.getData<DataMap<D>>("stages", options);
     return stages;
+  }
+
+  async getLocalization(options: GetDataOptions = {}): Promise<Localization> {
+    const localization = await this.getData<Localization>(
+      "localization",
+      options
+    );
+    return localization;
   }
 }

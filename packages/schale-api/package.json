@@ -1,6 +1,6 @@
 {
   "name": "@brak/schale-api",
-  "version": "0.25.116-beta",
+  "version": "0.25.120-alpha.0",
   "type": "module",
   "author": "Arathi of Nebnizilla",
   "license": "MIT",
@@ -25,11 +25,11 @@
     "test": "vitest run"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.3",
-    "@rslib/core": "^0.3.1",
-    "@types/node": "^22",
+    "@biomejs/biome": "catalog:",
+    "@rslib/core": "catalog:",
+    "@types/node": "catalog:",
     "axios": "^1.7.9",
-    "typescript": "^5.7.3",
-    "vitest": "^2.1.8"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

@@ -106,4 +106,70 @@ describe("SchaleApi 测试", async () => {
       console.info("获取国服物品20001001信息如下：", mug);
     }
   });
+
+  test("获取本地化信息", async () => {
+    {
+      // 日语
+      const l10n = await api.getLocalization({
+        language: Language.Japanese,
+      });
+
+      const explosion = l10n.BulletType.Explosion;
+      expect(explosion).toBe("爆発");
+
+      const gehenna = l10n.School.Gehenna;
+      expect(gehenna).toBe("ゲヘナ");
+
+      const millennium = l10n.SchoolLong.Millennium;
+      expect(millennium).toBe("ミレニアムサイエンススクール");
+    }
+
+    {
+      // 英语
+      const l10n = await api.getLocalization({
+        language: Language.English,
+      });
+
+      const explosion = l10n.BulletType.Explosion;
+      expect(explosion).toBe("Explosive");
+
+      const gehenna = l10n.School.Gehenna;
+      expect(gehenna).toBe("Gehenna");
+
+      const millennium = l10n.SchoolLong.Millennium;
+      expect(millennium).toBe("Millennium Science School");
+    }
+
+    {
+      // 简体中文
+      const l10n = await api.getLocalization({
+        language: Language.Chinese,
+      });
+
+      const explosion = l10n.BulletType.Explosion;
+      expect(explosion).toBe("爆发");
+
+      const gehenna = l10n.School.Gehenna;
+      expect(gehenna).toBe("歌赫娜");
+
+      const millennium = l10n.SchoolLong.Millennium;
+      expect(millennium).toBe("千禧年"); // 数据如此
+    }
+
+    {
+      // 繁体中文
+      const l10n = await api.getLocalization({
+        language: Language.ChineseTraditional,
+      });
+
+      const explosion = l10n.BulletType.Explosion;
+      expect(explosion).toBe("爆炸");
+
+      const gehenna = l10n.School.Gehenna;
+      expect(gehenna).toBe("格黑娜");
+
+      const millennium = l10n.SchoolLong.Millennium;
+      expect(millennium).toBe("千年科學學園");
+    }
+  });
 });
